@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rohit Kumar - Data Scientist & AI Architect</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;500;700&family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/feather-icons"></script>
+    <!-- Three.js, GSAP, and Tone.js for advanced interaction -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.9.1/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.9.1/ScrollTrigger.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.7.77/Tone.js"></script>
+    <style>
+        :root {
+            --bg-color: #010409;
+            --primary-color: #22d3ee; /* Neon Cyan */
+            --secondary-color: #d946ef; /* Fuchsia */
+            --text-color: #c9d1d9;
+            --card-bg: rgba(13, 17, 23, 0.5);
+            --border-color: rgba(34, 211, 238, 0.2);
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            overflow-x: hidden;
+        }
+        #bg-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+        }
+        .content-wrapper {
+            position: relative;
+            z-index: 1;
+            width: 100%;
+        }
+        .mono-font {
+            font-family: 'Roboto Mono', monospace;
+        }
+        .gradient-text {
+            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .glass-ui {
+            background: rgba(1, 4, 9, 0.6);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border-color);
+        }
+        .card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            backdrop-filter: blur(8px);
+            transition: transform 0.4s ease, box-shadow 0.4s ease;
+            transform-style: preserve-3d;
+        }
+        .card:hover {
+            box-shadow: 0 0 40px rgba(34, 211, 238, 0.3);
+        }
+        .tag {
+            background-color: rgba(34, 211, 238, 0.1);
+            color: var(--primary-color);
+            border: 1px solid rgba(34, 211, 238, 0.3);
+        }
+        .nav-link {
+            position: relative;
+            transition: color 0.3s;
+            padding: 8px 4px;
+            font-family: 'Roboto Mono', monospace;
+        }
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 2px;
+            bottom: -2px;
+            left: 0;
+            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+            transform: scaleX(0);
+            transform-origin: bottom right;
+            transition: transform 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+        }
+        .nav-link:hover::after, .nav-link.active::after {
+            transform: scaleX(1);
+            transform-origin: bottom left;
+        }
+        .nav-link:hover, .nav-link.active {
+            color: #fff;
+        }
+        .content-section {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 5rem 0;
+            opacity: 0;
+        }
+        .glitch {
+            position: relative;
+            color: white;
+            animation: glitch-skew 1s infinite linear alternate-reverse;
+        }
+        .glitch::before, .glitch::after {
+            content: attr(data-text);
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--bg-color);
+            overflow: hidden;
+        }
+        .glitch::before {
+            left: 2px;
+            text-shadow: -2px 0 var(--primary-color);
+            animation: glitch-anim-1 2s infinite linear alternate-reverse;
+        }
+        .glitch::after {
+            left: -2px;
+            text-shadow: -2px 0 var(--secondary-color);
+            animation: glitch-anim-2 2s infinite linear alternate-reverse;
+        }
+        @keyframes glitch-skew {
+            0% { transform: skew(0deg); } 100% { transform: skew(0deg); }
+            49% { transform: skew(0deg); } 50% { transform: skew(2deg); } 51% { transform: skew(0deg); }
+            99% { transform: skew(0deg); } 100% { transform: skew(-2deg); }
+        }
+        @keyframes glitch-anim-1 {
+            0% { clip-path: inset(10% 0 80% 0); } 100% { clip-path: inset(45% 0 45% 0); }
+        }
+        @keyframes glitch-anim-2 {
+            0% { clip-path: inset(70% 0 10% 0); } 100% { clip-path: inset(20% 0 70% 0); }
+        }
+    </style>
+</head>
+<body>
+    <div id="loader" class="fixed inset-0 bg-black z-[100] flex items-center justify-center">
+        <p class="text-white mono-font text-lg">Initializing Neural Core...</p>
+    </div>
+    <canvas id="bg-canvas"></canvas>
+
+    <div class="content-wrapper">
+        <header class="glass-ui fixed top-0 left-0 right-0 z-50">
+            <div class="container mx-auto px-6 py-4 flex justify-between items-center">
+                <a href="#home" class="text-2xl font-bold mono-font gradient-text">RK_</a>
+                <nav class="hidden md:flex space-x-8" id="desktop-nav">
+                    <a href="#home" class="nav-link text-slate-300 active">/home</a>
+                    <a href="#about" class="nav-link text-slate-300">/about</a>
+                    <a href="#skills" class="nav-link text-slate-300">/skills</a>
+                    <a href="#projects" class="nav-link text-slate-300">/projects</a>
+                    <a href="#contact" class="nav-link text-slate-300">/contact</a>
+                </nav>
+                <button id="mobile-menu-button" class="md:hidden text-slate-300">
+                    <i data-feather="menu" class="w-7 h-7"></i>
+                </button>
+            </div>
+            <div id="mobile-menu" class="hidden md:hidden">
+                 <a href="#home" class="block py-3 px-6 text-slate-300 hover:bg-white/5 mono-font">/home</a>
+                <a href="#about" class="block py-3 px-6 text-slate-300 hover:bg-white/5 mono-font">/about</a>
+                <a href="#skills" class="block py-3 px-6 text-slate-300 hover:bg-white/5 mono-font">/skills</a>
+                <a href="#projects" class="block py-3 px-6 text-slate-300 hover:bg-white/5 mono-font">/projects</a>
+                <a href="#contact" class="block py-3 px-6 text-slate-300 hover:bg-white/5 mono-font">/contact</a>
+            </div>
+        </header>
+
+        <main class="container mx-auto px-6">
+            <section id="home" class="content-section text-center">
+                <div class="max-w-4xl mx-auto">
+                    <h1 class="text-5xl md:text-8xl font-black leading-tight mb-4 glitch" data-text="Rohit Kumar">
+                        Rohit Kumar
+                    </h1>
+                    <h2 class="text-2xl md:text-4xl text-slate-200 font-medium mb-8" id="subtitle">
+                        Data Scientist & AI Architect
+                    </h2>
+                    <p class="text-lg text-slate-400 max-w-2xl mx-auto mb-10">
+                        Second-year BS in Data Science student at IIT Madras, crafting intelligent systems from complex data.
+                    </p>
+                </div>
+            </section>
+
+            <section id="about" class="content-section">
+                <div class="max-w-5xl mx-auto flex flex-col md:flex-row items-center gap-12">
+                    <div class="md:w-1/2 text-lg text-slate-300 space-y-4">
+                        <h2 class="text-4xl font-bold mb-4 gradient-text">About Me</h2>
+                        <p>Hello! I'm Rohit, a dedicated and ambitious second-year BS in Data Science student at the Indian Institute of Technology, Madras. My journey in tech is fueled by a deep curiosity for data and a desire to create software that solves real-world problems through analytics and machine learning.</p>
+                        <p>From data wrangling and statistical analysis to developing predictive models with TensorFlow, I enjoy tackling challenges across the entire data science pipeline. I'm a firm believer in continuous learning and am always seeking new datasets to explore and techniques to master.</p>
+                    </div>
+                    <div class="md:w-1/2 flex-shrink-0">
+                        <div class="card rounded-lg p-2 max-w-sm mx-auto">
+                            <img src="./moimage.png" alt="Rohit Kumar" class="rounded-md w-full">
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="skills" class="content-section">
+                <div class="max-w-5xl mx-auto flex flex-col md:flex-row items-center gap-12">
+                     <div class="md:w-1/2 text-lg text-slate-300 space-y-4">
+                        <h2 class="text-4xl font-bold mb-4 gradient-text">Core Competencies</h2>
+                        <p>I focus on a modern tech stack that allows me to build robust and scalable applications from end to end. My expertise lies in the intersection of data science, machine learning, and web development.</p>
+                    </div>
+                    <div class="md:w-1/2 w-full">
+                        <div id="skills-list" class="space-y-4"></div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="projects" class="content-section">
+                <h2 class="text-4xl md:text-5xl font-bold text-center mb-16 gradient-text">Featured Projects</h2>
+                <div class="max-w-6xl mx-auto grid md:grid-cols-2 lg:grid-cols-3 gap-8"></div>
+            </section>
+            
+            <section id="contact" class="content-section text-center">
+                <h2 class="text-3xl md:text-4xl font-bold mb-4 mono-font gradient-text">What's Next?</h2>
+                <h3 class="text-4xl md:text-5xl font-bold text-white mb-4">Get In Touch</h3>
+                <p class="text-lg text-slate-400 mb-8 max-w-xl mx-auto">I'm actively seeking internship opportunities and am open to freelance projects. If you have a challenge in mind, or just want to say hi, my inbox is always open.</p>
+                <div class="flex justify-center space-x-8 mt-12">
+                    <a href="mailto:techitout129@gmail.com" class="text-slate-400 hover:text-cyan-400 transition duration-300" aria-label="Email"><i data-feather="mail" class="w-10 h-10"></i></a>
+                    <a href="https://www.linkedin.com/in/vuhan2040" target="_blank" class="text-slate-400 hover:text-cyan-400 transition duration-300" aria-label="LinkedIn"><i data-feather="linkedin" class="w-10 h-10"></i></a>
+                    <a href="https://github.com/Intellecta2" target="_blank" class="text-slate-400 hover:text-cyan-400 transition duration-300" aria-label="GitHub"><i data-feather="github" class="w-10 h-10"></i></a>
+                </div>
+            </section>
+        </main>
+
+        <footer class="text-center text-slate-500 py-6 mt-16 mono-font">
+            <p>Designed & Built by Rohit Kumar</p>
+        </footer>
+    </div>
+    
+    <script>
+        /**
+         * ----------------------------------------------------------------
+         * Sound Engine
+         * ----------------------------------------------------------------
+         */
+        const synth = new Tone.PolySynth(Tone.Synth, {
+            oscillator: { type: "fmsine" },
+            envelope: { attack: 0.001, decay: 0.1, sustain: 0.1, release: 0.1 }
+        }).toDestination();
+
+        const playSound = (note) => {
+            if (Tone.context.state !== 'running') {
+                Tone.context.resume();
+            }
+            synth.triggerAttackRelease(note, "8n");
+        };
+
+        /**
+         * ----------------------------------------------------------------
+         * Three.js Interactive Scene & Scroll Animation
+         * ----------------------------------------------------------------
+         */
+        gsap.registerPlugin(ScrollTrigger);
+
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('bg-canvas'), antialias: true, alpha: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+        const group = new THREE.Group();
+        scene.add(group);
+        
+        // Data Stream
+        const curve = new THREE.CatmullRomCurve3(
+            Array.from({ length: 10 }, (_, i) => new THREE.Vector3(
+                Math.sin(i * 0.5) * 5,
+                (i / 2) - 10,
+                Math.cos(i * 0.5) * 5
+            ))
+        );
+        const tubeGeometry = new THREE.TubeGeometry(curve, 100, 0.01, 8, false);
+        const tubeMaterial = new THREE.MeshBasicMaterial({ color: 0x22d3ee, transparent: true, opacity: 0.3, wireframe: true });
+        const tube = new THREE.Mesh(tubeGeometry, tubeMaterial);
+        group.add(tube);
+        
+        // Particles
+        const particleCount = 2000;
+        const positions = new Float32Array(particleCount * 3);
+        for(let i = 0; i < particleCount; i++) {
+            const p = curve.getPoint(Math.random());
+            p.x += (Math.random() - 0.5) * 2;
+            p.y += (Math.random() - 0.5) * 2;
+            p.z += (Math.random() - 0.5) * 2;
+            positions.set([p.x, p.y, p.z], i * 3);
+        }
+        const particleGeometry = new THREE.BufferGeometry();
+        particleGeometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+        const particleMaterial = new THREE.PointsMaterial({ color: 0xd946ef, size: 0.03 });
+        const particles = new THREE.Points(particleGeometry, particleMaterial);
+        group.add(particles);
+
+        // Skills Icons in 3D
+        const skills3DGroup = new THREE.Group();
+        group.add(skills3DGroup);
+        
+        camera.position.set(0, -5, 10);
+        
+        const mouse = new THREE.Vector2();
+        window.addEventListener('mousemove', (event) => {
+            mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+            mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+        });
+
+        const clock = new THREE.Clock();
+        function animate() {
+            requestAnimationFrame(animate);
+            const elapsedTime = clock.getElapsedTime();
+            group.rotation.y = elapsedTime * 0.05;
+            camera.position.x += (mouse.x * 0.5 - camera.position.x) * 0.05;
+            camera.position.y += (-mouse.y * 0.5 - camera.position.y) * 0.05;
+            camera.lookAt(scene.position);
+            renderer.render(scene, camera);
+        }
+        animate();
+
+        // GSAP Scroll-based Animation
+        const tl = gsap.timeline({
+            scrollTrigger: {
+                trigger: ".content-wrapper",
+                start: "top top",
+                end: "bottom bottom",
+                scrub: 1,
+            }
+        });
+
+        tl.to(camera.position, { y: 10, z: 5 });
+        
+        document.querySelectorAll(".content-section").forEach((section) => {
+            gsap.to(section, {
+                opacity: 1,
+                scrollTrigger: {
+                    trigger: section,
+                    start: "top center",
+                    end: "center center",
+                    scrub: true,
+                }
+            });
+        });
+
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        });
+
+        /**
+         * ----------------------------------------------------------------
+         * UI Interactivity
+         * ----------------------------------------------------------------
+         */
+        document.addEventListener('DOMContentLoaded', () => {
+            feather.replace();
+            const loader = document.getElementById('loader');
+            gsap.to(loader, { opacity: 0, duration: 1, onComplete: () => loader.style.display = 'none' });
+
+            const mobileMenuButton = document.getElementById('mobile-menu-button');
+            const mobileMenu = document.getElementById('mobile-menu');
+            mobileMenuButton.addEventListener('click', () => {
+                playSound('C4');
+                mobileMenu.classList.toggle('hidden');
+            });
+            
+            document.querySelectorAll('a, button').forEach(el => {
+                el.addEventListener('mouseenter', () => playSound('C5'));
+            });
+
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    if (!mobileMenu.classList.contains('hidden')) mobileMenu.classList.add('hidden');
+                    document.querySelector(this.getAttribute('href')).scrollIntoView({ behavior: 'smooth' });
+                });
+            });
+            
+            const navLinks = document.querySelectorAll('#desktop-nav a');
+            const allSections = document.querySelectorAll('main section');
+            const scrollObserver = new IntersectionObserver((entries) => {
+                 entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        navLinks.forEach(link => {
+                            link.classList.toggle('active', link.getAttribute('href').substring(1) === entry.target.id);
+                        });
+                    }
+                 });
+            }, { rootMargin: "-50% 0px -50% 0px" });
+            allSections.forEach(section => scrollObserver.observe(section));
+
+            const skillsData = [
+                { name: 'Python', icon: 'python/python-original.svg' },
+                { name: 'TensorFlow', icon: 'tensorflow/tensorflow-original.svg' },
+                { name: 'PyTorch', icon: 'pytorch/pytorch-original.svg' },
+                { name: 'React.js', icon: 'react/react-original.svg' },
+                { name: 'Docker', icon: 'docker/docker-original.svg' },
+            ];
+
+            const projectsData = [
+                { title: 'Sentiment Analysis Engine', description: 'A deep learning model that classifies text sentiment with high accuracy, deployed via a REST API.', tags: ['Python', 'TensorFlow', 'Flask', 'Docker'], img: 'https://placehold.co/600x400/010409/22d3ee?text=Project+1' },
+                { title: 'Real-time Object Detection', description: 'Utilized YOLOv5 to build a system for real-time object detection in video streams, optimized for performance.', tags: ['Python', 'PyTorch', 'OpenCV', 'WebSockets'], img: 'https://placehold.co/600x400/010409/d946ef?text=Project+2' },
+                { title: 'Interactive Data Dashboard', description: 'A dynamic and responsive dashboard for visualizing complex datasets, built with React and D3.js.', tags: ['React.js', 'D3.js', 'Node.js', 'MongoDB'], img: 'https://placehold.co/600x400/010409/22d3ee?text=Project+3' }
+            ];
+            
+            const skillsContainer = document.getElementById('skills-list');
+            const textureLoader = new THREE.TextureLoader();
+            skillsData.forEach((skill, i) => {
+                const skillEl = document.createElement('div');
+                skillEl.className = 'card rounded-lg p-4 flex items-center gap-4';
+                skillEl.innerHTML = `<img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/${skill.icon}" class="h-10 w-10" alt="${skill.name}" loading="lazy"/><p class="font-bold text-slate-200 text-lg mono-font">${skill.name}</p>`;
+                skillsContainer.appendChild(skillEl);
+                
+                // 3D icon
+                const texture = textureLoader.load(`https://cdn.jsdelivr.net/gh/devicons/devicon/icons/${skill.icon}`);
+                const material = new THREE.SpriteMaterial({ map: texture, color: 0xffffff });
+                const sprite = new THREE.Sprite(material);
+                sprite.position.setFromSphericalCoords(2, Math.PI/2 + (i - skillsData.length/2) * 0.4, 0);
+                sprite.position.y += 4;
+                skills3DGroup.add(sprite);
+
+                skillEl.addEventListener('mouseenter', () => {
+                    gsap.to(sprite.scale, { x: 1.5, y: 1.5, z: 1.5, duration: 0.3 });
+                    const targetColor = new THREE.Color(0x22d3ee);
+                    gsap.to(sprite.material.color, { r: targetColor.r, g: targetColor.g, b: targetColor.b, duration: 0.3 });
+                });
+                skillEl.addEventListener('mouseleave', () => {
+                    gsap.to(sprite.scale, { x: 1, y: 1, z: 1, duration: 0.3 });
+                    const targetColor = new THREE.Color(0xffffff);
+                    gsap.to(sprite.material.color, { r: targetColor.r, g: targetColor.g, b: targetColor.b, duration: 0.3 });
+                });
+            });
+
+            const projectsContainer = document.querySelector('#projects .grid');
+            projectsContainer.innerHTML = projectsData.map(project => `<div class="card rounded-lg overflow-hidden flex flex-col" style="perspective: 1000px;"><div style="transform-style: preserve-3d;" class="inner-card h-full flex flex-col"><img src="${project.img}" alt="${project.title}" class="w-full h-48 object-cover"><div class="p-6 flex flex-col flex-grow"><h3 class="text-xl font-bold mb-2 text-slate-100 mono-font">${project.title}</h3><p class="text-slate-400 mb-4 flex-grow">${project.description}</p><div class="flex flex-wrap gap-2 mb-4">${project.tags.map(tag => `<span class="tag text-xs font-semibold px-2.5 py-1 rounded-full mono-font">${tag}</span>`).join('')}</div><div class="flex space-x-4 mt-auto pt-4 border-t border-white/10"><a href="#" class="border border-cyan-400 text-cyan-400 font-semibold py-2 px-4 rounded-md transition duration-300 w-full text-center hover:bg-cyan-400/10 mono-font">Demo</a><a href="#" class="bg-white/10 hover:bg-white/20 text-white font-semibold py-2 px-4 rounded-md transition duration-300 w-full text-center mono-font">Source</a></div></div></div></div>`).join('');
+            
+            document.querySelectorAll('#projects .card').forEach(card => {
+                card.addEventListener('mousemove', (e) => {
+                    const rect = card.getBoundingClientRect();
+                    const x = e.clientX - rect.left;
+                    const y = e.clientY - rect.top;
+                    const rotateY = -1/15 * (x - rect.width / 2);
+                    const rotateX = 1/15 * (y - rect.height / 2);
+                    const innerCard = card.querySelector('.inner-card');
+                    if (innerCard) {
+                        innerCard.style.transform = `rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+                    }
+                });
+                card.addEventListener('mouseleave', () => {
+                    const innerCard = card.querySelector('.inner-card');
+                    if (innerCard) {
+                        innerCard.style.transform = 'rotateX(0) rotateY(0)';
+                    }
+                });
+            });
+            
+            feather.replace();
+        });
+    </script>
+</body>
+</html>

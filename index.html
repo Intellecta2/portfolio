@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rohit Kumar - Portfolio</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/feather-icons"></script>
+    <!-- Three.js and GSAP for animations -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.9.1/gsap.min.js"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #000000;
+            color: #e2e8f0;
+            overflow-x: hidden;
+        }
+        #bg-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+        }
+        .gradient-text {
+            background: linear-gradient(90deg, #4f46e5, #db2777);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .glass-effect {
+            background: rgba(10, 10, 10, 0.5);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+        }
+        .card {
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.3s ease;
+        }
+        .card:hover {
+            transform: translateY(-10px) scale(1.03);
+            box-shadow: 0 25px 40px rgba(0,0,0,0.5);
+        }
+        .tag {
+            background-color: rgba(255,255,255,0.1);
+            color: #cbd5e1;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+        .nav-link {
+            position: relative;
+            transition: color 0.3s;
+            padding: 8px 0;
+        }
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            background: linear-gradient(90deg, #4f46e5, #db2777);
+            transition: width 0.4s cubic-bezier(0.23, 1, 0.320, 1);
+        }
+        .nav-link:hover::after, .nav-link.active::after {
+            width: 100%;
+        }
+        .nav-link:hover, .nav-link.active {
+            color: #fff;
+        }
+        .section-hidden {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+        }
+        .section-visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    </style>
+</head>
+<body>
+    <canvas id="bg-canvas"></canvas>
+
+    <header class="glass-effect fixed top-0 left-0 right-0 z-50">
+        <div class="container mx-auto px-6 py-3 flex justify-between items-center">
+            <a href="#" class="text-2xl font-bold gradient-text tracking-wider">RK</a>
+            <nav class="hidden md:flex space-x-8" id="desktop-nav">
+                <a href="#home" class="nav-link text-slate-300 active">Home</a>
+                <a href="#about" class="nav-link text-slate-300">About</a>
+                <a href="#skills" class="nav-link text-slate-300">Skills</a>
+                <a href="#projects" class="nav-link text-slate-300">Projects</a>
+                <a href="#achievements" class="nav-link text-slate-300">Achievements</a>
+                <a href="#contact" class="nav-link text-slate-300">Contact</a>
+            </nav>
+            <button id="mobile-menu-button" class="md:hidden text-slate-300">
+                <i data-feather="menu" class="w-7 h-7"></i>
+            </button>
+        </div>
+        <div id="mobile-menu" class="hidden md:hidden glass-effect">
+            <a href="#home" class="block py-3 px-6 text-slate-300 hover:bg-white/10">Home</a>
+            <a href="#about" class="block py-3 px-6 text-slate-300 hover:bg-white/10">About</a>
+            <a href="#skills" class="block py-3 px-6 text-slate-300 hover:bg-white/10">Skills</a>
+            <a href="#projects" class="block py-3 px-6 text-slate-300 hover:bg-white/10">Projects</a>
+            <a href="#achievements" class="block py-3 px-6 text-slate-300 hover:bg-white/10">Achievements</a>
+            <a href="#contact" class="block py-3 px-6 text-slate-300 hover:bg-white/10">Contact</a>
+        </div>
+    </header>
+
+    <main class="container mx-auto px-6 pt-24 relative z-10">
+        <section id="home" class="min-h-screen flex flex-col justify-center items-center text-center">
+            <div class="max-w-4xl">
+                <h1 class="text-5xl md:text-8xl font-extrabold leading-tight mb-4">
+                    <span class="gradient-text">Rohit Kumar</span>
+                </h1>
+                <h2 class="text-2xl md:text-4xl text-slate-200 font-medium mb-8" id="subtitle">
+                    Data Scientist & AI Architect
+                </h2>
+                <p class="text-lg text-slate-400 max-w-2xl mx-auto mb-8">
+                    Second-year BS in Data Science student at IIT Madras, crafting intelligent systems from complex data.
+                </p>
+                <div class="flex justify-center space-x-4">
+                    <a href="#projects" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-8 rounded-full transition duration-300 flex items-center space-x-2 shadow-lg hover:shadow-indigo-500/50 transform hover:scale-105">
+                        <span>View My Work</span>
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <div class="space-y-32">
+            <section id="about" class="py-20 section-hidden">
+                <h2 class="text-4xl font-bold text-center mb-16 gradient-text">About Me</h2>
+                <div class="glass-effect rounded-2xl p-8 md:p-12 flex flex-col md:flex-row items-center gap-12">
+                    <div class="md:w-1/3 flex-shrink-0">
+                        <img src="https://placehold.co/400x400/000000/ffffff?text=RK" alt="Rohit Kumar" class="rounded-full mx-auto shadow-2xl border-4 border-white/20 w-48 h-48 md:w-64 md:h-64 object-cover">
+                    </div>
+                    <div class="md:w-2/3 text-lg text-slate-300 space-y-4 text-center md:text-left">
+                        <p>I am a dedicated and ambitious second-year BS in Data Science student at the Indian Institute of Technology, Madras. My journey in tech is fueled by a deep curiosity for data and a desire to create software that solves real-world problems through analytics and machine learning.</p>
+                        <p>From data wrangling and statistical analysis to developing predictive models with TensorFlow, I enjoy tackling challenges across the entire data science pipeline. I'm a firm believer in continuous learning and am always seeking new datasets to explore and techniques to master.</p>
+                    </div>
+                </div>
+            </section>
+
+            <section id="skills" class="py-20 section-hidden">
+                <h2 class="text-4xl font-bold text-center mb-16 gradient-text">My Tech Stack</h2>
+                <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6 md:gap-8"></div>
+            </section>
+
+            <section id="projects" class="py-20 section-hidden">
+                <h2 class="text-4xl font-bold text-center mb-16 gradient-text">Featured Projects</h2>
+                <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8"></div>
+            </section>
+            
+            <section id="achievements" class="py-20 section-hidden">
+                <h2 class="text-4xl font-bold text-center mb-16 gradient-text">Achievements</h2>
+                <div class="max-w-3xl mx-auto space-y-6"></div>
+            </section>
+
+            <section id="contact" class="py-20 text-center section-hidden">
+                <h2 class="text-4xl font-bold mb-4 gradient-text">Get In Touch</h2>
+                <p class="text-lg text-slate-400 mb-8 max-w-2xl mx-auto">I'm currently open to internship opportunities and freelance projects. Feel free to reach out if you have a project in mind or just want to connect!</p>
+                <a href="mailto:techitout129@gmail.com" class="inline-block bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 hover:from-indigo-600 hover:via-purple-600 hover:to-pink-600 text-white font-bold py-4 px-8 rounded-full text-xl transition duration-300 shadow-lg hover:shadow-purple-500/40 transform hover:scale-105">
+                    Say Hello
+                </a>
+                <div class="flex justify-center space-x-6 mt-12">
+                    <a href="https://www.linkedin.com/in/vuhan2040" target="_blank" class="text-slate-400 hover:text-white transition duration-300"><i data-feather="linkedin" class="w-8 h-8"></i></a>
+                    <a href="https://github.com/Intellecta2" target="_blank" class="text-slate-400 hover:text-white transition duration-300"><i data-feather="github" class="w-8 h-8"></i></a>
+                    <a href="https://twitter.com/vuhan2040" target="_blank" class="text-slate-400 hover:text-white transition duration-300"><i data-feather="twitter" class="w-8 h-8"></i></a>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <footer class="border-t border-white/10 py-6 text-center text-slate-500 relative z-10">
+        <p>&copy; <span id="year"></span> Rohit Kumar. All Rights Reserved.</p>
+    </footer>
+<a href="./cybernetic.html"> Page2</a>
+    <script>
+        /**
+         * ----------------------------------------------------------------
+         * Three.js 3D Neural Network Background
+         * ----------------------------------------------------------------
+         */
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('bg-canvas'), antialias: true, alpha: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+
+        const group = new THREE.Group();
+        scene.add(group);
+
+        const NUM_PARTICLES = 150;
+        const particles = [];
+        const particleGeometry = new THREE.SphereGeometry(0.04, 16, 16);
+        const particleMaterial = new THREE.MeshStandardMaterial({
+            color: 0xdb2777,
+            emissive: 0x4f46e5,
+            emissiveIntensity: 0.5,
+            metalness: 0.8,
+            roughness: 0.2
+        });
+
+        for (let i = 0; i < NUM_PARTICLES; i++) {
+            const particle = new THREE.Mesh(particleGeometry, particleMaterial);
+            const theta = Math.random() * Math.PI * 2;
+            const phi = Math.acos(2 * Math.random() - 1);
+            const radius = 3 + Math.random() * 2;
+            particle.position.set(
+                radius * Math.cos(theta) * Math.sin(phi),
+                radius * Math.sin(theta) * Math.sin(phi),
+                radius * Math.cos(phi)
+            );
+            particles.push(particle);
+            group.add(particle);
+        }
+
+        const lines = new THREE.Group();
+        group.add(lines);
+        const lineMaterial = new THREE.LineBasicMaterial({
+            color: 0xffffff,
+            transparent: true,
+            opacity: 0.05
+        });
+
+        for (let i = 0; i < particles.length; i++) {
+            for (let j = i + 1; j < particles.length; j++) {
+                const p1 = particles[i];
+                const p2 = particles[j];
+                const dist = p1.position.distanceTo(p2.position);
+                if (dist < 1.5) {
+                    const geometry = new THREE.BufferGeometry().setFromPoints([p1.position, p2.position]);
+                    const line = new THREE.Line(geometry, lineMaterial);
+                    lines.add(line);
+                }
+            }
+        }
+        
+        camera.position.z = 8;
+        
+        let mouse = new THREE.Vector2();
+        document.addEventListener('mousemove', (event) => {
+            mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+            mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+        });
+
+        const clock = new THREE.Clock();
+        function animate() {
+            requestAnimationFrame(animate);
+            const elapsedTime = clock.getElapsedTime();
+            
+            group.rotation.y = elapsedTime * 0.1;
+            group.rotation.x = elapsedTime * 0.05;
+
+            camera.position.x += (mouse.x * 2 - camera.position.x) * 0.02;
+            camera.position.y += (mouse.y * 2 - camera.position.y) * 0.02;
+            camera.lookAt(scene.position);
+
+            renderer.render(scene, camera);
+        }
+        animate();
+
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+
+        /**
+         * ----------------------------------------------------------------
+         * UI Interactivity
+         * ----------------------------------------------------------------
+         */
+        document.addEventListener('DOMContentLoaded', () => {
+            feather.replace();
+
+            const mobileMenuButton = document.getElementById('mobile-menu-button');
+            const mobileMenu = document.getElementById('mobile-menu');
+            mobileMenuButton.addEventListener('click', () => {
+                mobileMenu.classList.toggle('hidden');
+            });
+
+            document.getElementById('year').textContent = new Date().getFullYear();
+
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    const href = this.getAttribute('href');
+                    if (href && href.length > 1 && href.startsWith('#')) {
+                        e.preventDefault();
+                        if (!mobileMenu.classList.contains('hidden')) {
+                             mobileMenu.classList.add('hidden');
+                        }
+                        const targetElement = document.querySelector(href);
+                        if (targetElement) {
+                            targetElement.scrollIntoView({ behavior: 'smooth' });
+                        }
+                    }
+                });
+            });
+
+            const sections = document.querySelectorAll('.section-hidden');
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('section-visible');
+                    }
+                });
+            }, { threshold: 0.15 });
+            sections.forEach(section => observer.observe(section));
+            
+            const navLinks = document.querySelectorAll('#desktop-nav a');
+            const allSections = document.querySelectorAll('main section');
+            const scrollObserver = new IntersectionObserver((entries) => {
+                 entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        navLinks.forEach(link => {
+                            link.classList.toggle('active', link.getAttribute('href').substring(1) === entry.target.id);
+                        });
+                    }
+                 });
+            }, { rootMargin: "-50% 0px -50% 0px" });
+            allSections.forEach(section => scrollObserver.observe(section));
+
+            const skillsData = [
+                { name: 'Python', icon: 'python/python-original.svg' },
+                { name: 'C++', icon: 'cplusplus/cplusplus-original.svg' },
+                { name: 'JavaScript', icon: 'javascript/javascript-original.svg' },
+                { name: 'TensorFlow', icon: 'tensorflow/tensorflow-original.svg' },
+                { name: 'PyTorch', icon: 'pytorch/pytorch-original.svg' },
+                { name: 'Scikit-learn', icon: 'scikitlearn/scikitlearn-original.svg' },
+                { name: 'React.js', icon: 'react/react-original.svg' },
+                { name: 'Node.js', icon: 'nodejs/nodejs-original.svg' },
+                { name: 'SQL', icon: 'mysql/mysql-original.svg' },
+                { name: 'Docker', icon: 'docker/docker-original.svg' },
+            ];
+
+            const projectsData = [
+                {
+                    title: 'Sentiment Analysis Engine',
+                    description: 'A deep learning model that classifies text sentiment with high accuracy, deployed via a REST API.',
+                    tags: ['Python', 'TensorFlow', 'Flask', 'Docker'],
+                    img: 'https://placehold.co/600x400/000000/db2777?text=Project+1'
+                },
+                {
+                    title: 'Real-time Object Detection',
+                    description: 'Utilized YOLOv5 to build a system for real-time object detection in video streams, optimized for performance.',
+                    tags: ['Python', 'PyTorch', 'OpenCV', 'WebSockets'],
+                    img: 'https://placehold.co/600x400/000000/4f46e5?text=Project+2'
+                },
+                {
+                    title: 'Interactive Data Dashboard',
+                    description: 'A dynamic and responsive dashboard for visualizing complex datasets, built with React and D3.js.',
+                    tags: ['React.js', 'D3.js', 'Node.js', 'MongoDB'],
+                    img: 'https://placehold.co/600x400/000000/9333ea?text=Project+3'
+                }
+            ];
+            
+            const achievementsData = [
+                { title: 'Winner, Smart India Hackathon 2024', description: 'Led a team to victory by developing an innovative solution for a problem statement in the healthcare domain.' },
+                { title: '5-Star Coder on HackerRank', description: 'Achieved a 5-star rating in problem-solving through consistent practice and algorithmic challenges.' },
+                { title: 'Certified TensorFlow Developer', description: 'Earned the official Google certification for building and training machine learning models with TensorFlow.' }
+            ];
+
+            const skillsContainer = document.querySelector('#skills .grid');
+            skillsContainer.innerHTML = skillsData.map(skill => `
+                <div class="card glass-effect p-6 flex flex-col items-center justify-center rounded-2xl text-center">
+                    <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/${skill.icon}" class="h-16 w-16 mb-4" alt="${skill.name}" loading="lazy"/>
+                    <p class="font-semibold text-slate-200">${skill.name}</p>
+                </div>
+            `).join('');
+
+            const projectsContainer = document.querySelector('#projects .grid');
+            projectsContainer.innerHTML = projectsData.map(project => `
+                <div class="card glass-effect rounded-2xl overflow-hidden flex flex-col">
+                    <img src="${project.img}" alt="${project.title}" class="w-full h-48 object-cover">
+                    <div class="p-6 flex flex-col flex-grow">
+                        <h3 class="text-2xl font-bold mb-2 text-slate-100">${project.title}</h3>
+                        <p class="text-slate-400 mb-4 flex-grow">${project.description}</p>
+                        <div class="flex flex-wrap gap-2 mb-4">
+                            ${project.tags.map(tag => `<span class="tag text-xs font-semibold px-2.5 py-1 rounded-full">${tag}</span>`).join('')}
+                        </div>
+                        <div class="flex space-x-4 mt-auto pt-4 border-t border-white/10">
+                            <a href="#" class="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 px-4 rounded-full transition duration-300 w-full text-center">Live Demo</a>
+                            <a href="#" class="bg-white/10 hover:bg-white/20 text-white font-semibold py-2 px-4 rounded-full transition duration-300 w-full text-center">Source</a>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+            
+            const achievementsContainer = document.querySelector('#achievements .space-y-6');
+            achievementsContainer.innerHTML = achievementsData.map(ach => `
+                <div class="card glass-effect rounded-2xl p-6">
+                    <h3 class="text-xl font-bold text-slate-100">${ach.title}</h3>
+                    <p class="text-slate-400 mt-2">${ach.description}</p>
+                </div>
+            `).join('');
+        });
+    </script>
+</body>
+</html>
