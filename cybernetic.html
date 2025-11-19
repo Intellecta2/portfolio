@@ -11,7 +11,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.9.1/gsap.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.9.1/ScrollTrigger.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.7.77/Tone.js"></script>
+    
     <style>
         :root {
             --bg-color: #010409;
@@ -149,7 +149,7 @@
     <div class="content-wrapper">
         <header class="glass-ui fixed top-0 left-0 right-0 z-50">
             <div class="container mx-auto px-6 py-4 flex justify-between items-center">
-                <a href="#home" class="text-2xl font-bold mono-font gradient-text">RK_</a>
+                <a href="#home" class="text-2xl font-bold mono-font gradient-text">RK</a>
                 <nav class="hidden md:flex space-x-8" id="desktop-nav">
                     <a href="#home" class="nav-link text-slate-300 active">/home</a>
                     <a href="#about" class="nav-link text-slate-300">/about</a>
@@ -240,17 +240,7 @@
          * Sound Engine
          * ----------------------------------------------------------------
          */
-        const synth = new Tone.PolySynth(Tone.Synth, {
-            oscillator: { type: "fmsine" },
-            envelope: { attack: 0.001, decay: 0.1, sustain: 0.1, release: 0.1 }
-        }).toDestination();
-
-        const playSound = (note) => {
-            if (Tone.context.state !== 'running') {
-                Tone.context.resume();
-            }
-            synth.triggerAttackRelease(note, "8n");
-        };
+        //deleted
 
         /**
          * ----------------------------------------------------------------
